@@ -1,18 +1,25 @@
 import socket
-import ca
 import cipher
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cas = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-port = 9500 #1. client connects to port 9500
+port = 9500 
 
-s.connect((socket.gethostbyname('localhost'),port)) #IP address of this computer on the network
+s.connect((socket.gethostbyname('localhost'),port)) 
 
 server_name = s.recv(1024).decode("utf-8")
 print("Connected to Server: ", server_name)
-server_public_key = ca.ValidateServer(server_name)
+
+#contact Certificate Authority with servername
+ca_server_port = 9502
+cas.connect((socket.gethostbyname('localhost'),ca_server_port))
+cas.send(server_name.encode("utf-8"))
+server_public_key = cas.recv(1024).decode("utf-8")
+# end Certificate Authority
+
 print("Authenticating...")
-if server_public_key is not None:
+if server_public_key != "Invalid":
     key = int( server_public_key )
     session_cipher = cipher.encrypt("Session Cipher Key", key)
     print("sending cipher...")

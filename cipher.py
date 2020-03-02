@@ -1,4 +1,5 @@
 def encrypt(text,key):
+    key = int(key)
     result = ""
     # transverse the plain text
     for i in range(len(text)):
